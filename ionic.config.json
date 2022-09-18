@@ -1,0 +1,7 @@
+{
+  "name": "risk_calc",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
