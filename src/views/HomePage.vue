@@ -4,7 +4,7 @@
       <div id="logo_container">
         <ion-img src="assets/icon/Logo.png"></ion-img> 
       </div>
-      <ion-button @click="show_settings" id="settings_btn" size="small" fill="clear"><ion-icon slot="start" name="settings-outline"></ion-icon>Settings</ion-button>
+      <ion-button @click="show_settings" id="settings_btn" size="small" fill="clear"><ion-icon slot="start" :src="settings_icon"></ion-icon>Settings</ion-button>
       <div id="container">
         <!-- form -->
         <ion-item class="price_inputs">
@@ -37,40 +37,41 @@
             <ion-label class="ion-text-wrap">Enter an exit price to calculate a reward:risk ratio</ion-label>
           </ion-item>
         </div>
-        <div class="generate_exits" v-else>
-          <div class="calculated_data">
-            <p>Risk Per Share</p>
-            <p>{{risk}}</p>
+        <div v-else>
+          <div class="generate_exits">
+            <div class="calculated_data">
+              <p>Risk Per Share</p>
+              <p>{{risk}}</p>
+            </div>
+            <div class="calculated_data">
+              <p>Cost To Enter</p>
+              <p>{{cost_to_enter.toLocaleString()}}</p>
+            </div>
+            <div class="calculated_data">
+              <p>Shares</p>
+              <p>{{max_shares}}</p>
+            </div>
           </div>
-          <div class="calculated_data">
-            <p>Cost To Enter</p>
-            <p>{{cost_to_enter.toLocaleString()}}</p>
-          </div>
-          <div class="calculated_data">
-            <p>Shares</p>
-            <p>{{max_shares}}</p>
-          </div>
-            <!-- <ion-item>
-              <ion-label class="calculated_data">
-                Risk Per Share {{risk}}
-              </ion-label>
-              <ion-label class="calculated_data">
-                Cost To Enter
-              </ion-label>
-              <ion-label class="calculated_data">
-                Shares
-              </ion-label>
-            </ion-item> -->
+          <ion-card >
+            <ion-card-content class="flex_card_content flex_card_content__header"><span>Risk:Reward</span><span>Exit</span><span>RPS</span><span>Total Reward</span></ion-card-content>
+          </ion-card>
+          <exit-card v-for="num in exit_list" :key="num" :ratio="num" :ent="entry" :rk="risk" :ms="max_shares">
+            <!-- <ion-card-content>{{ generateExit(num) }}</ion-card-content> -->
+            <!-- <span v-html="generateExit(num)"></span> -->
+            <!-- <exit-card ></exit-card> -->
+          </exit-card>
         </div>
-
       </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { IonContent, IonPage, IonLabel, IonInput, IonItem, IonSegment, IonSegmentButton, IonImg, IonIcon, IonButton } from '@ionic/vue';
+import { IonContent, IonPage, IonLabel, IonInput, IonItem, IonSegment, IonSegmentButton, IonImg, IonIcon, IonButton, IonCard, IonCardContent, } from '@ionic/vue';
+import ExitCard from './ExitCard.vue';
 import { defineComponent } from 'vue';
+import { settingsSharp } from 'ionicons/icons';
+/* eslint-disable */
 
 export default defineComponent({
   name: 'HomePage',
@@ -80,12 +81,15 @@ export default defineComponent({
     IonInput,
     IonItem,
     IonLabel,
-    IonSegment, 
+    IonSegment,
     IonSegmentButton,
     IonImg,
     IonIcon,
-    IonButton
-  },
+    IonButton,
+    IonCard,
+    IonCardContent,
+    ExitCard,
+},
   data() {
     return {
       entry: '',
@@ -94,6 +98,8 @@ export default defineComponent({
       direction: 'long',
       max_shares: 0,
       cost_to_enter: 0,
+      exit_list: [3,5,7],
+      settings_icon: settingsSharp,
       settings: {
         account_balance: 1400,
         max_risk: {
@@ -103,7 +109,7 @@ export default defineComponent({
         max_position_dollar_amount: 300,
         calc_cost_to_enter_using: 'mp', //mp = max_position, mr = max_risk
       },
-      //also affect visuals
+      //also effect visuals
       risk: 0,
       show_exits: false,
     }
@@ -125,12 +131,10 @@ export default defineComponent({
             this.cost_to_enter = this.max_shares * entry;
           }
         } else {
-          this.max_shares = this.settings.max_position_dollar_amount / entry;
+          console.log(this.settings.max_position_dollar_amount, entry)
+          this.max_shares = Math.floor(this.settings.max_position_dollar_amount / entry);
           this.cost_to_enter = this.max_shares * entry;
         }
-        // generate exits
-        //static 3x, 5x
-        //generate list and call generateExits 
         
       }
     }
@@ -140,6 +144,21 @@ export default defineComponent({
       // use for icon change, rotate on change
       console.log(e.detail.value);
     },
+    // generateExit(ratio: number) {
+    //   let entry : number = this.entry === '' ? 0 : Number(this.entry);
+    //   if (this.risk <= 0 || entry <= 0 || this.max_shares <= 0) {
+    //     return;
+    //   }
+    //   //for list that calls this, loop through settings.exits[] and grab the rest from data.
+    //   // if manual input for exit then add to front of settings.exits[]
+    //   let reward = Number((this.risk * ratio).toFixed(2));
+    //   console.log(typeof entry);
+    //   let exit = entry + reward;
+    //   console.log(exit)
+    //   let potential = reward * this.max_shares;
+    //   console.log(potential)
+    //   return '<ion-card-content class="flex_card_content"><span>1:'+ratio+'</span><span>'+exit+'</span><span>'+reward+'</span><span>'+potential+'</span></ion-card-content>';
+    // },
     calc_risk () {
       let risk = 0;
       let stop_loss = this.stop_loss === '' ? 0 : this.stop_loss;
@@ -154,29 +173,26 @@ export default defineComponent({
       this.risk = risk;
     },
     show_settings() {
-      //
       console.log('settings')
     }
 
   }
 });
 
-// function generateExits(ratio: number, risk: number, entry: any, shares: number) {
-//   //for list that calls this, loop through settings.exits[] and grab the rest from data.
-//   // if manual input for exit then add to front of settings.exits[]
-//   let reward = Number((risk * ratio).toFixed(2));
-//   console.log(reward);
-//   let exit = entry + reward;
-//   console.log(exit)
-//   let potential = reward * shares;
-//   console.log(potential)
-// }
+
 
 </script>
 
 <style scoped>
 #logo_container {
-  height: 65%;
+  height: 55%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#logo_container ion-img::part(image) {
+  height: 180px;
+  width: 180px;
 }
 #settings_btn {
   position: absolute;
@@ -186,11 +202,11 @@ export default defineComponent({
 }
 #container {
   text-align: center;
-  position: absolute;
+  /* position: absolute;
   left: 0;
   right: 0;
-  top: 65%;
-  transform: translateY(-50%);
+  top: 65%; */
+  /* transform: translateY(-50%); */
 }
 
 #container strong {
@@ -227,8 +243,21 @@ export default defineComponent({
 .price_inputs {
   margin-bottom: 12px;
 }
-
-.segment {
-  margin-bottom: 20px;
+.flex_card_content {
+  display: flex;
+  justify-content: space-between;
+  margin: 14px 0;
+  padding-left: 10px;
+  padding-right: 10px;
 }
+.flex_card_content__header {
+  font-size: bold;
+}
+.segment {
+  margin: 20px 0;
+  padding: 0 8px;
+}
+/* .rotate {
+  transform: rotate('180deg');
+} */
 </style>
