@@ -1,6 +1,6 @@
 <template>
   <ion-page> 
-    <ion-content :fullscreen="true"> 
+    <ion-content :fullscreen="true">
       <div id="logo_container">
         <ion-img src="assets/icon/Logo.png"></ion-img> 
       </div>
@@ -56,9 +56,6 @@
             <ion-card-content class="flex_card_content flex_card_content__header"><span>Risk:Reward</span><span>Exit</span><span>RPS</span><span>Total Reward</span></ion-card-content>
           </ion-card>
           <exit-card v-for="num in exit_list" :key="num" :ratio="num" :ent="entry" :rk="risk" :ms="max_shares">
-            <!-- <ion-card-content>{{ generateExit(num) }}</ion-card-content> -->
-            <!-- <span v-html="generateExit(num)"></span> -->
-            <!-- <exit-card ></exit-card> -->
           </exit-card>
         </div>
       </div>
@@ -144,21 +141,6 @@ export default defineComponent({
       // use for icon change, rotate on change
       console.log(e.detail.value);
     },
-    // generateExit(ratio: number) {
-    //   let entry : number = this.entry === '' ? 0 : Number(this.entry);
-    //   if (this.risk <= 0 || entry <= 0 || this.max_shares <= 0) {
-    //     return;
-    //   }
-    //   //for list that calls this, loop through settings.exits[] and grab the rest from data.
-    //   // if manual input for exit then add to front of settings.exits[]
-    //   let reward = Number((this.risk * ratio).toFixed(2));
-    //   console.log(typeof entry);
-    //   let exit = entry + reward;
-    //   console.log(exit)
-    //   let potential = reward * this.max_shares;
-    //   console.log(potential)
-    //   return '<ion-card-content class="flex_card_content"><span>1:'+ratio+'</span><span>'+exit+'</span><span>'+reward+'</span><span>'+potential+'</span></ion-card-content>';
-    // },
     calc_risk () {
       let risk = 0;
       let stop_loss = this.stop_loss === '' ? 0 : this.stop_loss;
@@ -173,13 +155,12 @@ export default defineComponent({
       this.risk = risk;
     },
     show_settings() {
-      console.log('settings')
+      console.log('settings');
+      this.$router.push({name: 'Settings'})
     }
 
   }
 });
-
-
 
 </script>
 
@@ -217,9 +198,7 @@ export default defineComponent({
 #container p {
   font-size: 16px;
   line-height: 22px;
-  
   color: #8c8c8c;
-  
   margin: 0;
 }
 

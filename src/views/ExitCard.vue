@@ -1,11 +1,10 @@
 <template>
     <ion-card>
-        <ion-card-content>
           <span v-html="generateExit(ratio, ent, rk, ms)"></span>  
-        </ion-card-content>
     </ion-card>
 </template>
 <script lang="ts">
+/* eslint-disable */
 import { IonCard, IonCardContent, } from '@ionic/vue';
 import { defineComponent } from 'vue';
 
@@ -38,7 +37,7 @@ export default defineComponent({
 <style>
 .flex_card_content {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   margin: 14px 0;
 }
 .flex_card_content span {
